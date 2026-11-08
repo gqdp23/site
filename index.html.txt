@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шам Марданов | Видеограф • Видеооператор • Рилсмейкер</title>
+    <meta name="description" content="Кинематографичная видеосъёмка, Reels, ивенты, реклама и свадьбы. Sony Cinema Line • DaVinci Resolve.">
+
+    <!-- Open Graph / Красивое превью ссылки для Telegram, WhatsApp, VK -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Шам Марданов | Видеограф • Рилсмейкер">
+    <meta property="og:description" content="Портфолио и шоурил: рекламные ролики, Reels 9:16, гала-ужины, ивенты и свадьбы. Связь в 2 клика.">
+    <meta property="og:image" content="https://wsrv.nl/?url=https://i.postimg.cc/pd58tzC6/Still-2026-11-04-020852-1-13-1.jpg&w=1200&q=90">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Шам Марданов | Видеограф • Рилсмейкер">
+    <meta name="twitter:description" content="Портфолио и шоурил: рекламные ролики, Reels 9:16, ивенты и свадьбы.">
+    <meta name="twitter:image" content="https://wsrv.nl/?url=https://i.postimg.cc/pd58tzC6/Still-2026-11-04-020852-1-13-1.jpg&w=1200&q=90">
+
+    <!-- Favicon (Красный индикатор записи REC на тёмном фоне) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23050505'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23ef4444'/%3E%3C/svg%3E">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://player.vimeo.com/api/player.js"></script>
+
+    <style>
+        :root {
+            --bg-obsidian: #050505;
+            --apple-gray: #86868b;
+        }
+
+        body {
+            background-color: var(--bg-obsidian);
+            color: #f5f5f7;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .text-appleGray {
+            color: var(--apple-gray);
+        }
+
+        /* Subtle Film Grain Overlay (Kept strictly on background, under videos & images) */
+        .film-grain {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Viewfinder Corners */
+        .viewfinder-corner {
+            width: 22px;
+            height: 22px;
+            border-color: rgba(255, 255, 255, 0.35);
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+
+        /* Glass Pill Header */
+        .glass-pill {
+            background: rgba(12, 12, 14, 0.72);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Smooth Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Hide Scrollbar */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* Interactive Cinema Background Spotlight & Anamorphic Flare */
+        #cinemaAmbient {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        /* Soft volumetric cinema light following cursor */
+        .cinema-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 750px;
+            height: 750px;
+            border-radius: 50%;
+            background: radial-gradient(
+                circle,
+                rgba(56, 189, 248, 0.08) 0%,
+                rgba(249, 115, 22, 0.04) 35%,
+                rgba(255, 255, 255, 0.015) 55%,
+                transparent 75%
+            );
+            filter: blur(35px);
+            mix-blend-mode: screen;
+            will-change: transform;
+        }
+
+        /* Subtle Camera Focus Reticle Follower */
+        #cinemaCursorRing {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 998;
+            transform: translate3d(-100px, -100px, 0) translate(-50%, -50%);
+            transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.35s ease,
+                        background-color 0.35s ease,
+                        opacity 0.4s ease;
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: contrast(1.08) brightness(1.05);
+            will-change: transform;
+        }
+
+        #cinemaCursorRing::before,
+        #cinemaCursorRing::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.35);
+            transition: all 0.3s ease;
+        }
+        #cinemaCursorRing::before {
+            width: 6px;
+            height: 1px;
+        }
+        #cinemaCursorRing::after {
+            width: 1px;
+            height: 6px;
+        }
+
+        #cinemaCursorRing.cursor-hover {
+            width: 72px;
+            height: 72px;
+            border-color: rgba(56, 189, 248, 0.55);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        @media (pointer: coarse) {
+            #cinemaAmbient, #cinemaCursorRing {
+                display: none !important;
+            }
+        }
+
+        /* Side Timeline Ruler (DaVinci / Premiere style) */
+        .timeline-ticks {
+            background-image: repeating-linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.28) 0px,
+                rgba(255, 255, 255, 0.28) 1px,
+                transparent 1px,
+                transparent 8px
+            );
+        }
+        .timeline-major-ticks {
+            background-image: repeating-linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.55) 0px,
+                rgba(255, 255, 255, 0.55) 1px,
+                transparent 1px,
+                transparent 40px
+            );
+        }
+    </style>
+</head>
+<body class="selection:bg-white selection:text-black">
+
+    <div class="film-grain"></div>
+
+    <!-- Interactive Cinema Lens Background & Focus Reticle -->
+    <div id="cinemaAmbient">
+        <div id="cinemaGlow" class="cinema-glow"></div>
+    </div>
+    <div id="cinemaCursorRing"></div>
+
+    <!-- Side NLE Timeline Scroll Indicator -->
+    <div id="sideTimeline" class="fixed right-3 sm:right-5 top-1/2 -translate-y-1/2 h-[42vh] w-6 z-40 hidden sm:flex flex-col items-end justify-between pointer-events-none select-none opacity-75">
+        <!-- Top In-Point Marker -->
+        <span class="text-[8px] font-mono text-white/35 tracking-widest pr-0.5">IN</span>
+        
+        <!-- Ruler Track -->
+        <div class="relative flex-1 w-full my-2 flex justify-end">
+            <!-- Fine Ticks -->
+            <div class="w-1.5 h-full timeline-ticks opacity-60"></div>
+            <!-- Major Ticks -->
+            <div class="w-2.5 h-full timeline-major-ticks absolute right-0 top-0"></div>
+            <!-- Subtle Vertical Spine -->
+            <div class="w-[1px] h-full bg-white/10 absolute right-0 top-0"></div>
+
+            <!-- Playhead Indicator -->
+            <div id="timelinePlayhead" class="absolute right-0 top-0 -translate-y-1/2 flex items-center gap-1.5 transition-transform duration-75 ease-out">
+                <span id="timelineSectionCode" class="text-[9px] font-mono text-white/70 bg-black/70 backdrop-blur-md px-1.5 py-0.5 rounded border border-white/10 tracking-tighter">
+                    00:00
+                </span>
+                <!-- Red Playhead Needle & Triangle -->
+                <div class="flex items-center">
+                    <div class="w-2.5 h-[2px] bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.9)]"></div>
+                    <div class="w-1.5 h-1.5 bg-red-500 rotate-45 -ml-1 shadow-[0_0_8px_rgba(239,68,68,0.9)]"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Out-Point Marker -->
+        <span class="text-[8px] font-mono text-white/35 tracking-widest pr-0.5">OUT</span>
+    </div>
+
+    <header class="fixed top-3 sm:top-4 inset-x-0 z-50 px-3 sm:px-8 pointer-events-none">
+        <div class="max-w-7xl mx-auto flex flex-col items-center gap-2">
+            <div class="w-full glass-pill rounded-full px-3.5 py-2 sm:px-6 sm:py-3 grid grid-cols-2 lg:grid-cols-3 items-center pointer-events-auto shadow-2xl">
+                
+                <!-- Left: Name & REC -->
+                <a href="#" class="flex items-center gap-2 sm:gap-2.5 justify-self-start group">
+                    <div class="relative flex items-center justify-center w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0">
+                        <span class="absolute w-2 h-2 rounded-full bg-red-500 animate-ping opacity-75"></span>
+                        <span class="relative w-2 h-2 rounded-full bg-red-500"></span>
+                    </div>
+                    <span class="font-medium tracking-tight text-[11px] sm:text-sm text-white uppercase flex items-center gap-1.5 sm:gap-2 whitespace-nowrap">
+                        Шам Марданов
+                        <span class="font-mono text-[9px] sm:text-[10px] text-white/60 border border-white/15 bg-white/5 px-1 sm:px-1.5 py-0.5 rounded">REC</span>
+                    </span>
+                </a>
+
+                <!-- Center: Symmetric Navigation (Desktop) -->
+                <nav class="hidden lg:flex items-center justify-center gap-7 justify-self-center whitespace-nowrap">
+                    <a href="#portfolio" class="text-xs font-mono uppercase tracking-widest text-white/60 hover:text-white transition-colors">Портфолио</a>
+                    <a href="#color" class="text-xs font-mono uppercase tracking-widest text-white/60 hover:text-white transition-colors">Цвет & Грейдинг</a>
+                    <a href="#contact" class="text-xs font-mono uppercase tracking-widest text-white/60 hover:text-white transition-colors">Коннект</a>
+                </nav>
+
+                <!-- Right: Status & Telegram CTA -->
+                <div class="flex items-center gap-2 sm:gap-3 justify-self-end">
+                    <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-[11px] font-mono text-emerald-300 whitespace-nowrap">Свободен на этой неделе</span>
+                    </div>
+                    <a href="https://t.me/takekeyandgo" target="_blank" class="px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full bg-white text-black active:scale-95 hover:bg-neutral-200 text-[11px] sm:text-xs font-medium tracking-wide transition-all flex items-center gap-1 sm:gap-1.5 whitespace-nowrap">
+                        <span>В Telegram</span>
+                        <i data-lucide="arrow-up-right" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="relative z-10 h-[100dvh] w-full flex items-center justify-center overflow-hidden">
+        <!-- Background Showreel Video (Vimeo Background Mode) -->
+        <div id="heroBgWrapper" class="absolute inset-0 bg-black overflow-hidden">
+            <!-- Полноэкранный фоновый поток Vimeo без кнопок и без звука в 1080p -->
+            <div id="heroVideo" class="absolute inset-0 pointer-events-none opacity-100 transition-transform duration-1000 overflow-hidden bg-black">
+                <iframe 
+                    id="heroVimeoIframe"
+                    src="https://player.vimeo.com/video/1243034719?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&playsinline=1&autopause=0&quality=1080p&max_quality=1080p&dnt=1" 
+                    class="absolute top-1/2 left-1/2 w-[177.78vh] min-w-full min-h-full h-[56.25vw] -translate-x-1/2 -translate-y-1/2 pointer-events-none border-0"
+                    allow="autoplay; fullscreen; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+            <div class="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/40 pointer-events-none z-10"></div>
+        </div>
+
+        <!-- Camera Viewfinder HUD (Hidden on Mobile, Visible on Desktop/Tablet) -->
+        <div class="hidden sm:flex absolute inset-10 top-28 bottom-10 pointer-events-none flex-col justify-between z-10">
+            <!-- Top HUD -->
+            <div class="flex justify-between items-start font-mono text-[10px] sm:text-xs text-white/60 tracking-widest px-2 pt-1">
+                <div class="flex items-center gap-3">
+                    <span class="text-white/90 font-medium">SONY CINEMA LINE</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="px-1.5 py-0.5 rounded bg-white/10 text-white/80">S-LOG3</span>
+                    <span class="hidden sm:inline">STBY / REC</span>
+                </div>
+            </div>
+            
+            <!-- Bottom HUD -->
+            <div class="flex justify-between items-end font-mono text-[10px] sm:text-xs text-white/60 tracking-widest px-2 pb-1">
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <span>ISO 800</span>
+                    <span>180°</span>
+                    <span>WB 5600K</span>
+                </div>
+                <div class="flex items-center gap-2 text-white/80">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                    <span id="liveTimecode">00:00:00:00</span>
+                </div>
+            </div>
+
+            <!-- Frame Corners -->
+            <div class="viewfinder-corner absolute top-0 left-0 border-t-2 border-l-2"></div>
+            <div class="viewfinder-corner absolute top-0 right-0 border-t-2 border-r-2"></div>
+            <div class="viewfinder-corner absolute bottom-0 left-0 border-b-2 border-l-2"></div>
+            <div class="viewfinder-corner absolute bottom-0 right-0 border-b-2 border-r-2"></div>
+            
+            <!-- Center Crosshair -->
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center opacity-20">
+                <div class="w-10 h-[1px] bg-white absolute"></div>
+                <div class="w-[1px] h-10 bg-white absolute"></div>
+            </div>
+        </div>
+
+        <!-- Center Content -->
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto">
+            <h1 class="text-5xl sm:text-7xl md:text-8xl font-light tracking-tight text-white mb-6 leading-none">
+                Mardanov
+            </h1>
+            
+            <!-- Quick Actions -->
+            <div class="mt-6 sm:mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                <button onclick="openModal('Showreel 2026', 'SONY CINEMA LINE • 4K', 'https://player.vimeo.com/video/1243034719?autoplay=1&playsinline=1&quality=1080p&max_quality=1080p&title=0&byline=0&portrait=0&dnt=1', '16:9')" 
+                        class="px-6 py-3.5 rounded-full bg-white text-black font-medium text-xs sm:text-sm active:scale-95 hover:scale-105 transition-all flex items-center gap-2.5 shadow-xl">
+                    <i data-lucide="play" class="w-4 h-4 fill-black"></i>
+                    <span>Смотреть шоурил</span>
+                </button>
+                <a href="#portfolio" class="px-6 py-3.5 rounded-full bg-white/10 active:scale-95 hover:bg-white/15 border border-white/15 text-white font-medium text-xs sm:text-sm backdrop-blur transition-all">
+                    К работам
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="portfolio" class="relative z-10 py-16 sm:py-32 px-4 sm:px-8 max-w-7xl mx-auto reveal">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-5 mb-8 sm:mb-12">
+            <div>
+                <span class="text-[11px] font-mono uppercase tracking-[0.2em] text-white/40 block mb-2">01 / Работы</span>
+                <h2 class="text-3xl sm:text-4xl font-light tracking-tight text-white">Портфолио</h2>
+            </div>
+
+            <!-- Format Filter Buttons -->
+            <div class="inline-flex p-1 rounded-full bg-white/5 border border-white/10 self-start sm:self-auto">
+                <button onclick="filterPortfolio('all')" data-filter="all" class="filter-btn px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider bg-white text-black transition-all">
+                    Все
+                </button>
+                <button onclick="filterPortfolio('9:16')" data-filter="9:16" class="filter-btn px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider text-white/60 hover:text-white transition-all">
+                    Reels 9:16
+                </button>
+                <button onclick="filterPortfolio('16:9')" data-filter="16:9" class="filter-btn px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider text-white/60 hover:text-white transition-all">
+                    16:9
+                </button>
+            </div>
+        </div>
+
+        <!-- Bento Portfolio Grid -->
+        <div id="portfolioGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 items-start">
+            
+            <!-- Item 1: 16:9 Саша & Илья -->
+            <div data-category="16:9"
+                 onclick="openModal('Саша & Илья', '16:9 • СВАДЬБА', 'https://player.vimeo.com/video/1244701122?autoplay=1&playsinline=1&quality=1080p&max_quality=1080p&title=0&byline=0&portrait=0&dnt=1', '16:9')"
+                 class="portfolio-item relative group cursor-pointer overflow-hidden rounded-2xl bg-neutral-900 border border-white/10 lg:col-span-2 aspect-video w-full active:scale-[0.99] transition-transform">
+                <div class="absolute inset-0 pointer-events-none opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 overflow-hidden bg-black">
+                    <iframe 
+                        src="https://player.vimeo.com/video/1244701122?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&playsinline=1&autopause=0&quality=1080p&dnt=1" 
+                        class="w-full h-full pointer-events-none border-0"
+                        allow="autoplay; fullscreen; picture-in-picture" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent pointer-events-none"></div>
+                <div class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur border border-white/15 flex items-center justify-center text-white opacity-90 group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all pointer-events-none">
+                    <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+                </div>
+                <div class="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5 flex justify-between items-end pointer-events-none">
+                    <div>
+                        <span class="px-2.5 py-1 bg-white/10 backdrop-blur rounded text-[10px] font-mono uppercase tracking-wider text-white/90 mb-1.5 sm:mb-2 inline-block">16:9 • СВАДЬБА</span>
+                        <h3 class="text-lg sm:text-2xl font-medium text-white leading-snug">Саша & Илья</h3>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item 2: 9:16 Reels -->
+            <div data-category="9:16"
+                 onclick="openModal('CODERED', '9:16 • БРЕНД ОДЕЖДЫ', 'https://player.vimeo.com/video/1244722747?autoplay=1&playsinline=1&quality=1080p&max_quality=1080p&title=0&byline=0&portrait=0&dnt=1', '9:16')"
+                 class="portfolio-item relative group cursor-pointer overflow-hidden rounded-2xl bg-black border border-white/10 aspect-[9/16] h-[420px] sm:h-[500px] w-auto max-w-full mx-auto active:scale-[0.99] transition-transform">
+                <div class="absolute inset-0 pointer-events-none opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 overflow-hidden bg-black">
+                    <iframe 
+                        src="https://player.vimeo.com/video/1244722747?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&playsinline=1&autopause=0&quality=1080p&dnt=1" 
+                        class="w-full h-full pointer-events-none border-0"
+                        allow="autoplay; fullscreen; picture-in-picture" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent pointer-events-none"></div>
+                <div class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur border border-white/15 flex items-center justify-center text-white opacity-90 group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all pointer-events-none">
+                    <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+                </div>
+                <div class="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5 pointer-events-none">
+                    <span class="px-2.5 py-1 bg-white/10 backdrop-blur rounded text-[10px] font-mono uppercase tracking-wider text-white/90 mb-1.5 sm:mb-2 inline-block">9:16 • БРЕНД ОДЕЖДЫ</span>
+                    <h3 class="text-lg sm:text-xl font-medium text-white">CODERED</h3>
+                </div>
+            </div>
+
+            <!-- Item 3: 9:16 Reels 2 -->
+            <div data-category="9:16"
+                 onclick="openModal('Lotte Hotels', '9:16 • ГАЛА-УЖИН', 'https://player.vimeo.com/video/1244734612?autoplay=1&playsinline=1&quality=1080p&max_quality=1080p&title=0&byline=0&portrait=0&dnt=1', '9:16')"
+                 class="portfolio-item relative group cursor-pointer overflow-hidden rounded-2xl bg-black border border-white/10 aspect-[9/16] h-[420px] sm:h-[500px] w-auto max-w-full mx-auto active:scale-[0.99] transition-transform">
+                <div class="absolute inset-0 pointer-events-none opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 overflow-hidden bg-black">
+                    <iframe 
+                        src="https://player.vimeo.com/video/1244734612?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&playsinline=1&autopause=0&quality=1080p&dnt=1" 
+                        class="w-full h-full pointer-events-none border-0"
+                        allow="autoplay; fullscreen; picture-in-picture" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent pointer-events-none"></div>
+                <div class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur border border-white/15 flex items-center justify-center text-white opacity-90 group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all pointer-events-none">
+                    <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+                </div>
+                <div class="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5 pointer-events-none">
+                    <span class="px-2.5 py-1 bg-white/10 backdrop-blur rounded text-[10px] font-mono uppercase tracking-wider text-white/90 mb-1.5 sm:mb-2 inline-block">9:16 • ГАЛА-УЖИН</span>
+                    <h3 class="text-lg sm:text-xl font-medium text-white">Lotte Hotels</h3>
+                </div>
+            </div>
+
+            <!-- Item 4: 16:9 Ферма рекса на Золотой осени -->
+            <div data-category="16:9" 
+                 onclick="openModal('Ферма рекса на Золотой осени', '16:9 • ВЫСТАВКА / ИВЕНТ', 'https://player.vimeo.com/video/1244621448?autoplay=1&playsinline=1&quality=1080p&max_quality=1080p&title=0&byline=0&portrait=0&dnt=1', '16:9')"
+                 class="portfolio-item relative group cursor-pointer overflow-hidden rounded-2xl bg-neutral-900 border border-white/10 lg:col-span-2 aspect-video w-full active:scale-[0.99] transition-transform">
+                <div class="absolute inset-0 pointer-events-none opacity-85 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700 overflow-hidden bg-black">
+                    <iframe 
+                        src="https://player.vimeo.com/video/1244621448?background=1&autoplay=1&loop=1&byline=0&title=0&muted=1&playsinline=1&autopause=0&quality=1080p&dnt=1" 
+                        class="w-full h-full pointer-events-none border-0"
+                        allow="autoplay; fullscreen; picture-in-picture" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent pointer-events-none"></div>
+                <div class="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 w-10 h-10 rounded-full bg-black/50 backdrop-blur border border-white/15 flex items-center justify-center text-white opacity-90 group-hover:scale-110 group-hover:bg-white group-hover:text-black transition-all pointer-events-none">
+                    <i data-lucide="play" class="w-4 h-4 fill-current ml-0.5"></i>
+                </div>
+                <div class="absolute bottom-4 left-4 right-4 sm:bottom-5 sm:left-5 sm:right-5 flex justify-between items-end pointer-events-none">
+                    <div>
+                        <span class="px-2.5 py-1 bg-white/10 backdrop-blur rounded text-[10px] font-mono uppercase tracking-wider text-white/90 mb-1.5 sm:mb-2 inline-block">16:9 • ВЫСТАВКА / ИВЕНТ</span>
+                        <h3 class="text-lg sm:text-2xl font-medium text-white leading-snug">Ферма рекса на Золотой осени</h3>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="color" class="relative z-10 py-16 sm:py-32 px-4 sm:px-8 max-w-6xl mx-auto border-t border-white/5 reveal">
+        <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+            <span class="text-[11px] font-mono uppercase tracking-[0.2em] text-white/40 block mb-2">02 / Цвет & Грейдинг</span>
+            <h2 class="text-3xl sm:text-4xl font-light tracking-tight text-white mb-3">S-Log3 → Финальный цвет</h2>
+            <p class="text-xs sm:text-sm text-appleGray font-mono">Потяни ползунок, чтобы сравнить исходник с камеры и готовую цветокоррекцию</p>
+        </div>
+        
+        <div id="compareContainer" class="relative w-full aspect-[4/3] sm:aspect-video rounded-2xl overflow-hidden cursor-ew-resize border border-white/10 bg-neutral-900 shadow-2xl select-none touch-pan-y">
+            
+            <!-- AFTER: Final Color Grade (Loaded via fast global CDN proxy to bypass ISP blocks on postimg.cc) -->
+            <img src="https://wsrv.nl/?url=https://i.postimg.cc/pd58tzC6/Still-2026-11-04-020852-1-13-1.jpg&w=1920&q=92&output=webp" 
+                 onerror="if(!this.dataset.fb1){this.dataset.fb1='1';this.src='https://i0.wp.com/i.postimg.cc/pd58tzC6/Still-2026-11-04-020852-1-13-1.jpg';}else if(!this.dataset.fb2){this.dataset.fb2='1';this.src='https://i.postimg.cc/pd58tzC6/Still-2026-11-04-020852-1-13-1.jpg';}"
+                 alt="Final Grade" 
+                 class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none" draggable="false">
+            
+            <div class="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-black/60 backdrop-blur border border-white/15 text-[9px] sm:text-xs font-mono uppercase tracking-wider text-white rounded-full pointer-events-none">
+                ФИНАЛ • DAVINCI
+            </div>
+
+            <!-- BEFORE: Sony S-Log3 Raw (Locked to exact full container geometry via clip-path) -->
+            <div id="beforeLayer" class="absolute inset-0 w-full h-full pointer-events-none" style="clip-path: inset(0 50% 0 0);">
+                <img src="https://wsrv.nl/?url=https://i.postimg.cc/pd58tzC6/Still-2026-11-04-020852-1-13-1.jpg&w=1920&q=92&output=webp" 
+                     onerror="if(!this.dataset.fb1){this.dataset.fb1='1';this.src='https://i0.wp.com/i.postimg.cc/pd58tzC6/Still-2026-11-04-020852-1-13-1.jpg';}else if(!this.dataset.fb2){this.dataset.fb2='1';this.src='https://i.postimg.cc/pd58tzC6/Still-2026-11-04-020852-1-13-1.jpg';}"
+                     alt="S-LOG3" 
+                     id="beforeImage"
+                     class="absolute inset-0 w-full h-full object-cover object-center filter saturate-[0.22] contrast-[0.65] brightness-[1.08] sepia-[0.06]" draggable="false">
+                <div class="absolute bottom-3 left-3 sm:bottom-4 sm:left-4 z-20 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-black/60 backdrop-blur border border-white/15 text-[9px] sm:text-xs font-mono uppercase tracking-wider text-white/80 rounded-full">
+                    SONY S-LOG3
+                </div>
+            </div>
+
+            <!-- Center Drag Handle -->
+            <div id="sliderLine" class="absolute inset-y-0 left-1/2 w-[2px] bg-white/90 pointer-events-none flex items-center justify-center z-30 shadow-[0_0_15px_rgba(255,255,255,0.5)]">
+                <div class="w-10 h-10 rounded-full bg-white text-black shadow-xl flex items-center justify-center transition-transform">
+                    <i data-lucide="move-horizontal" class="w-4 h-4"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="relative z-10 py-16 sm:py-32 px-4 border-t border-white/5 text-center overflow-hidden reveal">
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-white/[0.02] rounded-full blur-3xl pointer-events-none"></div>
+
+        <span class="text-[11px] font-mono uppercase tracking-[0.2em] text-white/40 block mb-3 relative z-10">03 / Коннект в 2 клика</span>
+        <h2 class="text-2xl sm:text-5xl font-light tracking-tight text-white mb-7 sm:mb-10 relative z-10">
+            Выбери задачу и удобный мессенджер
+        </h2>
+
+        <!-- Step 1: Task Buttons -->
+        <div id="taskSelector" class="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-4xl mx-auto mb-7 sm:mb-8 relative z-10">
+            <button type="button" onclick="selectTask(this, 'Привет, Шам! Интересует съёмка Reels / контента.')" class="task-btn active-task px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white text-black border border-white text-xs sm:text-sm font-medium transition-all flex items-center gap-2 shadow-lg">
+                <span>📱 Reels / Контент</span>
+            </button>
+            <button type="button" onclick="selectTask(this, 'Привет, Шам! Нужен ролик для бренда / бизнеса.')" class="task-btn px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-white/85 hover:border-white/40 hover:text-white transition-all flex items-center gap-2">
+                <span>🎬 Реклама / Бренд</span>
+            </button>
+            <button type="button" onclick="selectTask(this, 'Привет, Шам! Нужна съёмка мероприятия / ивента.')" class="task-btn px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-white/85 hover:border-white/40 hover:text-white transition-all flex items-center gap-2">
+                <span>🥂 Ивент / Мероприятие</span>
+            </button>
+            <button type="button" onclick="selectTask(this, 'Привет, Шам! Интересует свадебная съёмка.')" class="task-btn px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-white/85 hover:border-white/40 hover:text-white transition-all flex items-center gap-2">
+                <span>💍 Свадьба / Love Story</span>
+            </button>
+            <button type="button" onclick="selectTask(this, 'Привет, Шам! Интересует съёмка в путешествии / тревел.')" class="task-btn px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-white/85 hover:border-white/40 hover:text-white transition-all flex items-center gap-2">
+                <span>🌍 Тревел / Путешествие</span>
+            </button>
+            <button type="button" onclick="selectTask(this, 'Привет, Шам! Интересует спортивная съёмка.')" class="task-btn px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-white/85 hover:border-white/40 hover:text-white transition-all flex items-center gap-2">
+                <span>⚡ Спорт</span>
+            </button>
+            <button type="button" onclick="selectTask(this, 'Привет, Шам! Посмотрел портфолио, хочу обсудить свою задачу.')" class="task-btn px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-white/85 hover:border-white/40 hover:text-white transition-all flex items-center gap-2">
+                <span>💡 Другое / Свой запрос</span>
+            </button>
+        </div>
+
+        <!-- Step 2: Messenger Selection -->
+        <div id="messengerBox" class="relative z-10 max-w-3xl mx-auto mb-10 sm:mb-12 p-3 sm:p-5 rounded-3xl bg-white/[0.03] border border-white/10 backdrop-blur-xl transition-all duration-300">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+                <!-- Telegram -->
+                <a id="tgLink" href="https://t.me/takekeyandgo?text=%D0%9F%D1%80%D0%B8%D0%B2%D0%B5%D1%82,%20%D0%A8%D0%B0%D0%BC!%20%D0%98%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%81%D1%8A%D1%91%D0%BC%D0%BA%D0%B0%20Reels%20/%20%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%BD%D1%82%D0%B0." target="_blank" rel="noopener noreferrer" 
+                   class="group flex items-center justify-between px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-2xl bg-white/[0.05] active:scale-95 hover:bg-white hover:text-black border border-white/10 transition-all">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-2 h-2 rounded-full bg-sky-400 shrink-0"></span>
+                        <div class="text-left truncate">
+                            <div class="text-[11px] sm:text-xs font-mono uppercase tracking-wider font-medium">Telegram</div>
+                            <div class="text-[9px] sm:text-[10px] font-mono opacity-50 truncate">@takekeyandgo</div>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-50 group-hover:opacity-100 transition-opacity shrink-0"></i>
+                </a>
+
+                <!-- WhatsApp -->
+                <a id="waLink" href="https://wa.me/79393942816?text=%D0%9F%D1%80%D0%B8%D0%B2%D0%B5%D1%82,%20%D0%A8%D0%B0%D0%BC!%20%D0%98%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%81%D1%83%D0%B5%D1%82%20%D1%81%D1%8A%D1%91%D0%BC%D0%BA%D0%B0%20Reels%20/%20%D0%BA%D0%BE%D0%BD%D1%82%D0%B5%D0%BD%D1%82%D0%B0." target="_blank" rel="noopener noreferrer"
+                   class="group flex items-center justify-between px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-2xl bg-white/[0.05] active:scale-95 hover:bg-white hover:text-black border border-white/10 transition-all">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                        <div class="text-left truncate">
+                            <div class="text-[11px] sm:text-xs font-mono uppercase tracking-wider font-medium">WhatsApp</div>
+                            <div class="text-[9px] sm:text-[10px] font-mono opacity-50 truncate">+7 939 394-28-16</div>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-50 group-hover:opacity-100 transition-opacity shrink-0"></i>
+                </a>
+
+                <!-- MAX Messenger -->
+                <button type="button" onclick="copyForMessenger('+79393942816', 'maxStatusText', '+7 939 394-28-16')"
+                   class="group flex items-center justify-between px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-2xl bg-white/[0.05] active:scale-95 hover:bg-white hover:text-black border border-white/10 transition-all cursor-pointer text-left">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-2 h-2 rounded-full bg-purple-400 shrink-0"></span>
+                        <div class="text-left truncate">
+                            <div class="text-[11px] sm:text-xs font-mono uppercase tracking-wider font-medium">MAX</div>
+                            <div id="maxStatusText" class="text-[9px] sm:text-[10px] font-mono opacity-50 truncate">+7 939 394-28-16</div>
+                        </div>
+                    </div>
+                    <i data-lucide="copy" class="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-50 group-hover:opacity-100 transition-opacity shrink-0"></i>
+                </button>
+
+                <!-- VK -->
+                <a id="vkLink" href="https://vk.ru/mardanov36172294" target="_blank" rel="noopener noreferrer"
+                   onclick="copyTaskTextSilently()"
+                   class="group flex items-center justify-between px-3.5 py-3 sm:px-4 sm:py-3.5 rounded-2xl bg-white/[0.05] active:scale-95 hover:bg-white hover:text-black border border-white/10 transition-all">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 shrink-0"></span>
+                        <div class="text-left truncate">
+                            <div class="text-[11px] sm:text-xs font-mono uppercase tracking-wider font-medium">VK</div>
+                            <div class="text-[9px] sm:text-[10px] font-mono opacity-50 truncate">mardanov36172294</div>
+                        </div>
+                    </div>
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-50 group-hover:opacity-100 transition-opacity shrink-0"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- Direct Call Block -->
+        <div class="relative z-10 mb-14 flex justify-center">
+            <a href="tel:+79393942816" class="group inline-flex items-center gap-3 px-6 py-3.5 rounded-full bg-white/[0.03] hover:bg-white hover:text-black border border-white/10 backdrop-blur-xl transition-all duration-300">
+                <span class="w-7 h-7 rounded-full bg-white/10 group-hover:bg-black/10 flex items-center justify-center transition-colors">
+                    <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                </span>
+                <span class="text-xs font-mono uppercase tracking-wider font-medium">Позвонить</span>
+                <span class="text-white/20 group-hover:text-black/30">•</span>
+                <span class="text-xs font-mono opacity-60 group-hover:opacity-100">+7 939 394-28-16</span>
+            </a>
+        </div>
+
+        <div class="relative z-10 flex flex-col items-center gap-2">
+            <span class="text-[11px] font-mono text-white/25">© 2026 Шам Марданов</span>
+        </div>
+    </section>
+
+    <div id="videoModal" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl hidden items-center justify-center p-4 sm:p-8 opacity-0 transition-opacity duration-300">
+        <button onclick="closeModal()" class="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white text-white hover:text-black flex items-center justify-center transition-all z-20">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+
+        <div class="w-full max-w-5xl flex flex-col items-center">
+            <div id="modalWrapper" class="w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/15 shadow-2xl relative">
+                <video id="modalVideo" class="w-full h-full object-contain bg-black" controls playsinline></video>
+                <iframe id="modalIframe" class="w-full h-full bg-black hidden" allow="autoplay; fullscreen" allowfullscreen></iframe>
+            </div>
+            <div class="w-full flex justify-between items-center mt-4 px-2">
+                <div>
+                    <p id="modalCategory" class="text-[11px] font-mono uppercase tracking-widest text-white/50"></p>
+                    <h4 id="modalTitle" class="text-lg sm:text-xl font-medium text-white"></h4>
+                </div>
+                <a href="https://t.me/takekeyandgo?text=Привет,%20Шам!%20Понравился%20ролик%20в%20портфолио,%20хочу%20обсудить%20съёмку." target="_blank" class="px-4 py-2 rounded-full bg-white text-black text-xs font-medium hover:bg-neutral-200 transition-all">
+                    Хочу так же →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Safely initialize Lucide icons
+        function initIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        document.addEventListener('DOMContentLoaded', initIcons);
+        window.addEventListener('load', initIcons);
+
+        // Force 1080p stream resolution on Hero Vimeo background video
+        (function forceHeroVimeoHD() {
+            const heroIframe = document.getElementById('heroVimeoIframe');
+            if (!heroIframe || typeof Vimeo === 'undefined') return;
+            try {
+                const player = new Vimeo.Player(heroIframe);
+                player.ready().then(() => {
+                    player.setQuality('1080p').catch(() => {});
+                });
+                player.on('play', () => {
+                    player.setQuality('1080p').catch(() => {});
+                });
+            } catch (err) {}
+        })();
+
+        let currentTaskMessage = 'Привет, Шам! Интересует съёмка Reels / контента.';
+
+        function selectTask(btnEl, messageText) {
+            currentTaskMessage = messageText;
+
+            // Update active styling on task buttons
+            document.querySelectorAll('.task-btn').forEach(btn => {
+                btn.className = 'task-btn px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white/5 border border-white/10 text-xs sm:text-sm font-medium text-white/85 hover:border-white/40 hover:text-white transition-all flex items-center gap-2';
+            });
+            btnEl.className = 'task-btn active-task px-4 py-2.5 sm:px-5 sm:py-3 rounded-full bg-white text-black border border-white text-xs sm:text-sm font-medium transition-all flex items-center gap-2 shadow-lg scale-[1.03]';
+
+            // Update preview text
+            const previewEl = document.getElementById('selectedTaskPreview');
+            if (previewEl) {
+                previewEl.textContent = `«${messageText}»`;
+            }
+
+            // Update Telegram & WhatsApp URLs dynamically with encoded text
+            const encoded = encodeURIComponent(messageText);
+            const tgLink = document.getElementById('tgLink');
+            const waLink = document.getElementById('waLink');
+            if (tgLink) tgLink.href = `https://t.me/takekeyandgo?text=${encoded}`;
+            if (waLink) waLink.href = `https://wa.me/79393942816?text=${encoded}`;
+
+            // Subtle pulse feedback on Step 2 box
+            const box = document.getElementById('messengerBox');
+            if (box) {
+                box.classList.add('border-white/30', 'bg-white/[0.06]');
+                setTimeout(() => {
+                    box.classList.remove('border-white/30', 'bg-white/[0.06]');
+                }, 350);
+            }
+        }
+
+        function copyTextToClipboard(text) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {}
+            document.body.removeChild(tempInput);
+        }
+
+        function copyForMessenger(phone, labelId, defaultText) {
+            copyTextToClipboard(phone);
+            const label = document.getElementById(labelId);
+            if (label) {
+                label.textContent = 'Номер скопирован!';
+                label.classList.remove('opacity-50');
+                label.classList.add('text-emerald-400', 'opacity-100');
+                setTimeout(() => {
+                    label.textContent = defaultText;
+                    label.classList.remove('text-emerald-400', 'opacity-100');
+                    label.classList.add('opacity-50');
+                }, 2200);
+            }
+        }
+
+        function copyTaskTextSilently() {
+            copyTextToClipboard(currentTaskMessage);
+        }
+
+        // Safe Video Play/Pause to prevent AbortError
+        function safePlayVideo(videoEl) {
+            if (!videoEl) return;
+            const playPromise = videoEl.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {});
+            }
+        }
+
+        function safePauseVideo(videoEl) {
+            if (!videoEl) return;
+            videoEl.pause();
+        }
+
+        // Portfolio Filter Logic
+        function filterPortfolio(category) {
+            const items = document.querySelectorAll('.portfolio-item');
+            const buttons = document.querySelectorAll('.filter-btn');
+
+            buttons.forEach(btn => {
+                if (btn.getAttribute('data-filter') === category) {
+                    btn.className = 'filter-btn px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider bg-white text-black transition-all';
+                } else {
+                    btn.className = 'filter-btn px-4 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider text-white/60 hover:text-white transition-all';
+                }
+            });
+
+            items.forEach(item => {
+                const itemCat = item.getAttribute('data-category');
+                if (category === 'all' || itemCat === category) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        // Video Lightbox Modal
+        const modal = document.getElementById('videoModal');
+        const modalVideo = document.getElementById('modalVideo');
+        const modalIframe = document.getElementById('modalIframe');
+        const modalWrapper = document.getElementById('modalWrapper');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalCategory = document.getElementById('modalCategory');
+
+        function openModal(title, category, videoSrc, ratio) {
+            if (!modal || !modalVideo) return;
+            modalTitle.textContent = title;
+            modalCategory.textContent = category;
+            
+            if (ratio === '9:16') {
+                modalWrapper.className = 'w-full max-w-[320px] sm:max-w-sm aspect-[9/16] max-h-[72dvh] bg-black rounded-2xl overflow-hidden border border-white/15 shadow-2xl relative mx-auto';
+            } else {
+                modalWrapper.className = 'w-full aspect-video bg-black rounded-2xl overflow-hidden border border-white/15 shadow-2xl relative';
+            }
+
+            const isIframeEmbed = (videoSrc.includes('drive.google.com') && videoSrc.includes('/preview')) || videoSrc.includes('player.vimeo.com');
+
+            if (isIframeEmbed && modalIframe) {
+                modalVideo.classList.add('hidden');
+                safePauseVideo(modalVideo);
+                modalVideo.src = '';
+                modalIframe.src = videoSrc;
+                modalIframe.className = 'w-full h-full bg-black border-0';
+                modalIframe.classList.remove('hidden');
+            } else {
+                if (modalIframe) {
+                    modalIframe.classList.add('hidden');
+                    modalIframe.src = '';
+                }
+                modalVideo.classList.remove('hidden');
+                modalVideo.src = videoSrc;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                if (!isIframeEmbed) {
+                    safePlayVideo(modalVideo);
+                }
+            });
+        }
+
+        function closeModal() {
+            if (!modal || !modalVideo) return;
+            modal.classList.add('opacity-0');
+            safePauseVideo(modalVideo);
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                modalVideo.src = '';
+                if (modalIframe) {
+                    modalIframe.src = '';
+                    modalIframe.classList.add('hidden');
+                }
+                modalVideo.classList.remove('hidden');
+            }, 250);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Live 24fps Camera Timecode
+        let frameCount = 0;
+        setInterval(() => {
+            frameCount = (frameCount + 1) % 24;
+            const now = new Date();
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            const f = String(frameCount).padStart(2, '0');
+            const tc = document.getElementById('liveTimecode');
+            if (tc) tc.textContent = `00:${m}:${s}:${f}`;
+        }, 41);
+
+        // Color Grading Before/After Slider (Zero-shift clip-path geometry)
+        const container = document.getElementById('compareContainer');
+        const beforeLayer = document.getElementById('beforeLayer');
+        const sliderLine = document.getElementById('sliderLine');
+        let isDragging = false;
+
+        function moveSlider(clientX) {
+            if (!container || !beforeLayer || !sliderLine) return;
+            const rect = container.getBoundingClientRect();
+            let x = clientX - rect.left;
+            x = Math.max(0, Math.min(x, rect.width));
+            const percent = (x / rect.width) * 100;
+            beforeLayer.style.clipPath = `inset(0 ${100 - percent}% 0 0)`;
+            sliderLine.style.left = `${percent}%`;
+        }
+
+        if (container) {
+            container.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                moveSlider(e.clientX);
+            });
+            window.addEventListener('mouseup', () => isDragging = false);
+            window.addEventListener('mousemove', (e) => {
+                if (isDragging) moveSlider(e.clientX);
+            });
+
+            container.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                moveSlider(e.touches[0].clientX);
+            }, { passive: true });
+            window.addEventListener('touchend', () => isDragging = false);
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging) moveSlider(e.touches[0].clientX);
+            }, { passive: true });
+        }
+
+        // Scroll Reveal Observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+        // Side NLE Timeline Playhead Logic
+        (function initSideTimeline() {
+            const playhead = document.getElementById('timelinePlayhead');
+            const codeLabel = document.getElementById('timelineSectionCode');
+            if (!playhead || !codeLabel) return;
+
+            function updateTimeline() {
+                const scrollTop = window.scrollY || document.documentElement.scrollTop;
+                const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0;
+
+                // Move playhead along track height
+                const track = playhead.parentElement;
+                if (track) {
+                    const yPos = progress * track.clientHeight;
+                    playhead.style.top = `${yPos}px`;
+                }
+
+                // Format scroll progress as NLE sequence timecode (00:00 -> 03:00)
+                const totalFrames = Math.floor(progress * 180); // 3-section sequence representation
+                const sec = String(Math.floor(totalFrames / 60)).padStart(2, '0');
+                const frm = String(totalFrames % 60).padStart(2, '0');
+                codeLabel.textContent = `${sec}:${frm}`;
+            }
+
+            window.addEventListener('scroll', updateTimeline, { passive: true });
+            window.addEventListener('resize', updateTimeline);
+            updateTimeline();
+        })();
+
+        // Interactive Cinema Mouse Trail (Soft Backlight + Centered Focus Ring + Hero Parallax)
+        (function initCinemaCursor() {
+            const ambient = document.getElementById('cinemaAmbient');
+            const glow = document.getElementById('cinemaGlow');
+            const ring = document.getElementById('cinemaCursorRing');
+            const heroVideo = document.getElementById('heroVideo');
+
+            if (!ambient || !glow || !ring) return;
+
+            let mouseX = window.innerWidth / 2;
+            let mouseY = window.innerHeight / 2;
+            let glowX = mouseX;
+            let glowY = mouseY;
+            let ringX = mouseX;
+            let ringY = mouseY;
+            let isVisible = false;
+
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+
+                if (!isVisible) {
+                    isVisible = true;
+                    glowX = mouseX;
+                    glowY = mouseY;
+                    ringX = mouseX;
+                    ringY = mouseY;
+                    ambient.style.opacity = '1';
+                    ring.style.opacity = '1';
+                }
+
+                // Subtle camera pan parallax on Hero video
+                if (heroVideo && window.scrollY < window.innerHeight) {
+                    const moveX = ((mouseX / window.innerWidth) - 0.5) * -18;
+                    const moveY = ((mouseY / window.innerHeight) - 0.5) * -18;
+                    heroVideo.style.transform = `scale(1.07) translate(${moveX}px, ${moveY}px)`;
+                }
+            });
+
+            document.addEventListener('mouseleave', () => {
+                isVisible = false;
+                ambient.style.opacity = '0';
+                ring.style.opacity = '0';
+            });
+
+            // Expand focus ring on interactive elements
+            const interactiveSelectors = 'a, button, .portfolio-item, #compareContainer';
+            document.querySelectorAll(interactiveSelectors).forEach(el => {
+                el.addEventListener('mouseenter', () => ring.classList.add('cursor-hover'));
+                el.addEventListener('mouseleave', () => ring.classList.remove('cursor-hover'));
+            });
+
+            // Smooth interpolation loop (60fps)
+            function renderCinemaEffect() {
+                // Smooth inertia for soft background light
+                glowX += (mouseX - glowX) * 0.08;
+                glowY += (mouseY - glowY) * 0.08;
+
+                // Responsive tracking for centered focus ring
+                ringX += (mouseX - ringX) * 0.28;
+                ringY += (mouseY - ringY) * 0.28;
+
+                glow.style.transform = `translate3d(${glowX}px, ${glowY}px, 0) translate(-50%, -50%)`;
+                ring.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+
+                requestAnimationFrame(renderCinemaEffect);
+            }
+
+            requestAnimationFrame(renderCinemaEffect);
+        })();
+    </script>
+</body>
+</html>
